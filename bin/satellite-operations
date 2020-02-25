@@ -4,7 +4,7 @@ $LOAD_PATH << File.expand_path("../lib", __dir__)
 require "bundler/setup"
 require "active_support/core_ext/object/blank"
 require "optimist"
-require "topological_inventory/satellite/receptor/client"
+require "receptor_controller/client"
 require "topological_inventory/satellite/operations/worker"
 
 def parse_args
@@ -35,7 +35,7 @@ SourcesApiClient.configure do |config|
   config.host   = "#{args[:sources_host]}:#{args[:sources_port]}"
 end
 
-TopologicalInventory::Satellite::Receptor::Client.configure do |config|
+ReceptorController::Client.configure do |config|
   config.controller_scheme = args[:receptor_controller_scheme]
   config.controller_host   = "#{args[:receptor_controller_host]}:#{args[:receptor_controller_port]}"
   config.queue_host        = args[:queue_host]
