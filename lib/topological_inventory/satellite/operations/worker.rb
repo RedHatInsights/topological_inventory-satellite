@@ -1,6 +1,6 @@
 require "manageiq-messaging"
+require "receptor_controller-client"
 require "topological_inventory/satellite/logging"
-require "topological_inventory/satellite/receptor/client"
 require "topological_inventory/satellite/operations/processor"
 require "topological_inventory/satellite/operations/source"
 require "topological_inventory/providers/common/operations/health_check"
@@ -16,7 +16,7 @@ module TopologicalInventory
         end
 
         def run
-          receptor_client = TopologicalInventory::Satellite::Receptor::Client.new(:logger => logger)
+          receptor_client = ReceptorController::Client.new(:logger => logger)
           receptor_client.start
 
           # Open a connection to the messaging service

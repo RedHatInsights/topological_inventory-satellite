@@ -3,14 +3,14 @@ require "topological_inventory/satellite/operations/worker"
 RSpec.describe TopologicalInventory::Satellite::Operations::Worker do
   describe "#run" do
     let(:client) { double("ManageIQ::Messaging::Client") }
-    let(:receptor_client) { double("TopologicalInventory::Satellite::Receptor::Client") }
+    let(:receptor_client) { double("ReceptorController::Client") }
     let(:subject) { described_class.new }
     before do
       require "manageiq-messaging"
       allow(ManageIQ::Messaging::Client).to receive(:open).and_return(client)
       allow(client).to receive(:close)
 
-      allow(TopologicalInventory::Satellite::Receptor::Client).to receive(:new).and_return(receptor_client)
+      allow(ReceptorController::Client).to receive(:new).and_return(receptor_client)
       allow(receptor_client).to receive(:start)
       allow(receptor_client).to receive(:stop)
     end
