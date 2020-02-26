@@ -28,15 +28,31 @@ module TopologicalInventory
         response['status']
       end
 
+      # @param :type [Symbol] :non_blocking | :blocking
+      #
       # @return [String] UUID - message ID for callbacks
-      def send_availability_check(source_ref, receptor_node_id, receiver)
-        receptor_client.send_directive(account_number,
-                                       receptor_node_id,
-                                       :directive         => "receptor_satellite:health_check",
-                                       :payload           => {'satellite_instance_id' => source_ref.to_s}.to_json,
-                                       :response_object   => receiver,
-                                       :response_callback => :availability_check_response,
-                                       :timeout_callback  => :availability_check_timeout)
+      def send_availability_check(source_uid, receptor_node_id, receiver)
+        directive = receptor_client.directive(account_number,
+                                              receptor_node_id,
+                                              :directive => "receptor_satellite:health_check",
+                                              :payload   => {'satellite_instance_id' => source_uid.to_s}.to_json,
+                                              :type      => :non_blocking)
+
+        directive
+          .on_success do |msg_id, response|
+            receiver.availability_check_response(msg_id, response)
+          end
+          .on_error do |msg_id, code|
+            receiver.availability_check_error(msg_id, code)
+          end
+          .on_timeout do |msg_id|
+            receiver.availability_check_timeout(msg_id)
+          end
+          .on_eof do |msg_id|
+            puts "EOF received: #{msg_id}"
+          end
+
+        directive.call
       end
 
       private
