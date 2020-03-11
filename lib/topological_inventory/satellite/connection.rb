@@ -42,14 +42,14 @@ module TopologicalInventory
           .on_success do |msg_id, response|
             receiver.availability_check_response(msg_id, response)
           end
-          .on_error do |msg_id, code|
-            receiver.availability_check_error(msg_id, code)
+          .on_error do |msg_id, code, response|
+            receiver.availability_check_error(msg_id, code, response)
           end
           .on_timeout do |msg_id|
             receiver.availability_check_timeout(msg_id)
           end
           .on_eof do |msg_id|
-            puts "EOF received: #{msg_id}"
+            logger.debug("EOF received: #{msg_id}")
           end
 
         directive.call

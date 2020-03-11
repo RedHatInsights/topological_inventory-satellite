@@ -59,9 +59,9 @@ module TopologicalInventory
           update_source_and_subresources(status, response['message'])
         end
 
-        def availability_check_error(msg_id, error_code)
+        def availability_check_error(msg_id, error_code, response)
           msg = "#{ERROR_MESSAGES[:receptor_response_error]}: #{error_code}"
-          logger.error("Source#availability_check for source #{source_id}#{msg} | (message_id: #{msg_id})")
+          logger.error("Source#availability_check for source #{source_id}#{msg} | (message_id: #{msg_id} | error: #{response})")
           update_source_and_subresources(STATUS_UNAVAILABLE, msg)
         end
 
