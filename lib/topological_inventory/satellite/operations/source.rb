@@ -38,7 +38,7 @@ module TopologicalInventory
           status, error_message = connection_status
           # Because the response is asynchronous, it can update only in case of error
           unless available?(status)
-            update_source_and_endpoint(STATUS_UNAVAILABLE, error_message)
+            update_source_and_subresources(STATUS_UNAVAILABLE, error_message)
           end
         end
 
@@ -52,16 +52,16 @@ module TopologicalInventory
           connected = response['result'] == 'ok' && response['fifi_status']
           status = connected ? STATUS_AVAILABLE : STATUS_UNAVAILABLE
 
-          # unless available?(status)
-          #   logger.info("Source #{source_id} is unavailable. Result: #{response['result']}, FIFI status: #{response['fifi_status'] ? 'T' : 'F'}, Reason: #{response['message']}")
-          # end
-          logger.info("Source#availability_check for source #{source_id} completed. Status: #{status}, Result: #{response['result']}, FIFI status: #{response['fifi_status'] ? 'T' : 'F'}, Reason: #{response['message']}")
+          unless available?(status)
+            logger.availability_check("Source #{source_id} is unavailable. Result: #{response['result']}, FIFI status: #{response['fifi_status'] ? 'T' : 'F'}, Reason: #{response['message']}")
+          end
+          logger.availability_check("Completed: Source #{source_id}. Status: #{status}, Result: #{response['result']}, FIFI status: #{response['fifi_status'] ? 'T' : 'F'}, Reason: #{response['message']}")
           update_source_and_subresources(status, response['message'])
         end
 
         def availability_check_error(msg_id, error_code, response)
           msg = "#{ERROR_MESSAGES[:receptor_response_error]}: #{error_code}"
-          logger.error("Source#availability_check for source #{source_id}#{msg} | (message_id: #{msg_id} | error: #{response})")
+          logger.availability_check("Source#availability_check for source #{source_id}#{msg} | (message_id: #{msg_id} | error: #{response})", :error)
           update_source_and_subresources(STATUS_UNAVAILABLE, msg)
         end
 
@@ -71,7 +71,7 @@ module TopologicalInventory
         #
         # @param msg_id [String] UUID of request's id
         def availability_check_timeout(msg_id)
-          logger.error("Source#availability_check - Receptor doesn't respond for Source (ID #{source_id}) | (message id: #{msg_id})")
+          logger.availability_check("Receptor doesn't respond for Source (ID #{source_id}) | (message id: #{msg_id})", :error)
           update_source_and_subresources(STATUS_UNAVAILABLE, ERROR_MESSAGES[:receptor_not_responding])
         end
 
@@ -102,7 +102,7 @@ module TopologicalInventory
 
           [status, msg]
         rescue => e
-          logger.error("Source#availability_check - Failed to connect to Source id:#{source_id} - #{e.message}. #{e.backtrace.join('\n')}")
+          logger.availability_check("Failed to connect to Source id:#{source_id} - #{e.message}. #{e.backtrace.join('\n')}", :error)
           [STATUS_UNAVAILABLE, e.message]
         end
 
