@@ -61,6 +61,14 @@ RSpec.describe TopologicalInventory::Satellite::Operations::Source do
       end
     end
 
+    # TODO: This shouldn't be omitted!
+    it "doesn't update the Source's status if Source could be available" do
+      expect(subject).to receive(:connection_status).and_return(described_class::STATUS_AVAILABLE)
+      expect(subject).not_to receive(:update_source_and_endpoint)
+
+      subject.send(:availability_check)
+    end
+
     it "updates the Sources's status if Source is unavailable" do
       expect(subject).to receive(:connection_status).and_return(described_class::STATUS_UNAVAILABLE)
       expect(subject).to receive(:update_source_and_subresources)
@@ -88,7 +96,7 @@ RSpec.describe TopologicalInventory::Satellite::Operations::Source do
 
       expect(subject).to receive(:update_source_and_subresources).with(described_class::STATUS_AVAILABLE, response['message'])
 
-      subject.send(:availability_check_response, nil, 'response', response)
+      subject.send(:availability_check_response, nil, response)
     end
 
     it "updates Source to 'unavailable' if response not ok" do
@@ -100,7 +108,7 @@ RSpec.describe TopologicalInventory::Satellite::Operations::Source do
 
       expect(subject).to receive(:update_source_and_subresources).with(described_class::STATUS_UNAVAILABLE, response['message'])
 
-      subject.send(:availability_check_response, nil, 'response', response)
+      subject.send(:availability_check_response, nil, response)
     end
 
     it "updates Source to 'unavailable' if Satellite not ready for FIFI" do
@@ -112,7 +120,19 @@ RSpec.describe TopologicalInventory::Satellite::Operations::Source do
 
       expect(subject).to receive(:update_source_and_subresources).with(described_class::STATUS_UNAVAILABLE, response['message'])
 
-      subject.send(:availability_check_response, nil, 'response', response)
+      subject.send(:availability_check_response, nil, response)
+    end
+  end
+
+  describe "#availability_check_error" do
+    subject { described_class.new }
+
+    it "updates Source to 'unavailable'" do
+      error_code = '1'
+      message = "#{described_class::ERROR_MESSAGES[:receptor_response_error]}: #{error_code}"
+      expect(subject).to receive(:update_source_and_endpoint).with(described_class::STATUS_UNAVAILABLE, message)
+
+      subject.send(:availability_check_error, nil, error_code, 'Text')
     end
   end
 
