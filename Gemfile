@@ -16,11 +16,12 @@ gem "rake", ">= 12.3.3"
 gem "rest-client", "~>2.0"
 gem "sources-api-client", "~> 3.0"
 gem "topological_inventory-ingress_api-client", "~> 1.0"
-gem "topological_inventory-providers-common", "~> 1.0.10"
+gem "topological_inventory-providers-common", "~> 2.1.0"
 group :development, :test do
   gem "rspec"
-  gem 'rubocop',             "~>0.69.0", :require => false
-  gem 'rubocop-performance', "~>1.3",    :require => false
+  gem "rubocop",             "~> 1.0.0", :require => false
+  gem "rubocop-performance", "~> 1.8",   :require => false
+  gem "rubocop-rails",       "~> 2.8",   :require => false
   gem "simplecov",           "~>0.17.1"
   gem "webmock"
 end
