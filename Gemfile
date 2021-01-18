@@ -13,10 +13,12 @@ gem "more_core_extensions"
 gem "optimist"
 gem "prometheus_exporter", "~> 0.4.5"
 gem "rake", ">= 12.3.3"
+gem "rdkafka", "~> 0.8.1"
+gem "receptor_controller-client", "~> 0.0.7"
 gem "rest-client", "~>2.0"
 gem "sources-api-client", "~> 3.0"
 gem "topological_inventory-ingress_api-client", "~> 1.0"
-gem "topological_inventory-providers-common", "~> 2.1.3"
+gem "topological_inventory-providers-common", "~> 2.1.5"
 group :development, :test do
   gem "rspec"
   gem "rubocop",             "~> 1.0.0", :require => false
